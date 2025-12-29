@@ -1,0 +1,25 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fundo Oficial Dark -->
+  <rect width="512" height="512" fill="#000807"/>
+  
+  <!-- Definições de Filtro para Brilho (Neon Glow) -->
+  <defs>
+    <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Ícone da Lua Centralizado -->
+  <g transform="translate(146, 100) scale(9)">
+    <!-- Brilho de Fundo -->
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="#A663CC" opacity="0.4" filter="url(#neon-glow)"/>
+    <!-- Ícone Principal -->
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="#A663CC" stroke="#FFFFFF" stroke-width="0.5"/>
+  </g>
+
+  <!-- Tipografia MoonFlix -->
+  <text x="50%" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="84" letter-spacing="-3">
+    <tspan fill="#d8b4fe" filter="url(#neon-glow)">Moon</tspan><tspan fill="#FFFFFF">Flix</tspan>
+  </text>
+</svg>
