@@ -6,105 +6,57 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
-  isPremium: boolean;
   signOut: () => Promise<void>;
-  subscribe: () => void;
+  subscribe: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
   isLoading: true,
-  isPremium: false,
   signOut: async () => {},
-  subscribe: () => {},
+  subscribe: async () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
-    let mounted = true;
-
-    const initSession = async () => {
-      try {
-        // Verificar sessão atual com tratamento de erro
-        const { data, error } = await supabase.auth.getSession();
-        
-        if (error) throw error;
-        
-        if (mounted) {
-          setSession(data.session);
-          setUser(data.session?.user ?? null);
-          checkPremiumStatus(data.session?.user?.id);
-        }
-      } catch (error) {
-        console.warn('Auth initialization failed (offline or invalid key?):', error);
-        // Mantém estado deslogado em caso de erro
-        if (mounted) {
-          setSession(null);
-          setUser(null);
-        }
-      } finally {
-        if (mounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    initSession();
+    // Verificar sessão atual
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    });
 
     // Escutar mudanças na autenticação
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (mounted) {
-        setSession(session);
-        setUser(session?.user ?? null);
-        checkPremiumStatus(session?.user?.id);
-        setIsLoading(false);
-      }
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsLoading(false);
     });
 
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
-  const checkPremiumStatus = (userId?: string) => {
-    if (!userId) {
-        setIsPremium(false);
-        return;
-    }
-    // Simulação de persistência de plano via LocalStorage
-    const localStatus = localStorage.getItem(`moonflix_premium_${userId}`);
-    setIsPremium(localStatus === 'true');
-  };
-
-  const subscribe = () => {
-    if (user) {
-        localStorage.setItem(`moonflix_premium_${user.id}`, 'true');
-        setIsPremium(true);
-    }
-  };
-
   const signOut = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error("Sign out error:", error);
-    }
+    await supabase.auth.signOut();
     setUser(null);
     setSession(null);
-    setIsPremium(false);
+  };
+
+  const subscribe = async () => {
+    // Mock de assinatura (placeholder para integração de pagamento)
+    console.log("Subscription initiated for user:", user?.email);
+    // Em um cenário real, aqui seria chamada a API de pagamento ou atualizado o status do usuário
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isLoading, isPremium, signOut, subscribe }}>
+    <AuthContext.Provider value={{ user, session, isLoading, signOut, subscribe }}>
       {children}
     </AuthContext.Provider>
   );

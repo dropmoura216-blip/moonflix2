@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Navbar } from './components/Navbar';
-import { BottomNav } from './components/BottomNav';
 import { Hero } from './components/Hero';
 import { MovieRow } from './components/MovieRow';
 import { Footer } from './components/Footer';
@@ -46,14 +45,9 @@ const MainApp: React.FC = () => {
   const { user, isLoading: authLoading } = useAuth();
   
   // --- STATE OTIMIZADO ---
-  // globalCatalogRef: Armazena TODOS os dados sem causar re-render quando atualizado.
-  // Isso é crucial para performance com listas grandes (+50k itens).
   const globalCatalogRef = useRef<Movie[]>(RAW_PARSED_MOVIES);
-  
-  // displayCatalog: Estado usado apenas para passar dados para componentes que precisam reagir a mudanças (como Browse)
   const [displayCatalog, setDisplayCatalog] = useState<Movie[]>(RAW_PARSED_MOVIES);
   
-  // Dados específicos da Home (mantidos pequenos para renderização rápida)
   const [featuredHero, setFeaturedHero] = useState<Movie>(EMPTY_HERO_MOVIE);
   const [homeLists, setHomeLists] = useState<{
     releases: Movie[];
@@ -80,85 +74,78 @@ const MainApp: React.FC = () => {
   // --- FASE 1: INICIALIZAÇÃO LEVE (Apenas Filmes) ---
   useEffect(() => {
     const initFast = async () => {
-      try {
-        // 1. Pega apenas filmes iniciais para a Home
-        const movies = RAW_PARSED_MOVIES;
-        
-        // Identifica itens prioritários (Hero, Top 10, Lançamentos e Trending)
-        const rawHero = movies.find(m => m.id === 5) || movies[0];
-        const rawTop10 = movies.slice(0, 10);
-        const rawReleases = movies.slice(0, 20); // Aumentado para 20
-        const rawTrending = movies.slice(25, 45); // Definido explicitamente e aumentado para 20 itens
+      // 1. Pega apenas filmes iniciais para a Home
+      const movies = RAW_PARSED_MOVIES;
+      
+      // Identifica itens prioritários (Hero, Top 10, Lançamentos e Trending)
+      const rawHero = movies.find(m => m.id === 5) || movies[0];
+      const rawTop10 = movies.slice(0, 10);
+      const rawReleases = movies.slice(0, 20); 
+      const rawTrending = movies.slice(25, 45); 
 
-        // IDs para enriquecer com TMDB imediatamente (Incluindo Trending agora!)
-        const priorityIds = new Set([
-          rawHero.id, 
-          ...rawTop10.map(m => m.id), 
-          ...rawReleases.map(m => m.id),
-          ...rawTrending.map(m => m.id)
-        ]);
-        const priorityBatch = movies.filter(m => priorityIds.has(m.id));
+      // IDs para enriquecer com TMDB imediatamente (Incluindo Trending agora!)
+      const priorityIds = new Set([
+        rawHero.id, 
+        ...rawTop10.map(m => m.id), 
+        ...rawReleases.map(m => m.id),
+        ...rawTrending.map(m => m.id)
+      ]);
+      const priorityBatch = movies.filter(m => priorityIds.has(m.id));
 
-        // Busca dados enriquecidos (paralelo limitado pelo TmdbService)
-        // TmdbService já trata erros internamente, mas garantimos aqui
-        const enrichedPriority = await Promise.all(
-          priorityBatch.map(async (movie) => {
-            if (movie.imdbId) {
-               return await TmdbService.getMovieDetails(movie.imdbId, movie).catch(() => movie);
-            }
-            return movie;
-          })
-        );
+      // Busca dados enriquecidos (paralelo limitado pelo TmdbService)
+      const enrichedPriority = await Promise.all(
+        priorityBatch.map(async (movie) => {
+          if (movie.imdbId) {
+             return await TmdbService.getMovieDetails(movie.imdbId, movie);
+          }
+          return movie;
+        })
+      );
 
-        // Atualiza o catálogo global com os dados enriquecidos
-        enrichedPriority.forEach(enriched => {
-          const idx = globalCatalogRef.current.findIndex(m => m.id === enriched.id);
-          if (idx !== -1) globalCatalogRef.current[idx] = enriched;
-        });
+      // Atualiza o catálogo global com os dados enriquecidos
+      enrichedPriority.forEach(enriched => {
+        const idx = globalCatalogRef.current.findIndex(m => m.id === enriched.id);
+        if (idx !== -1) globalCatalogRef.current[idx] = enriched;
+      });
 
-        // Configura dados da Home
-        const finalHero = enrichedPriority.find(m => m.id === rawHero.id) || rawHero;
-        
-        // Preload da imagem do Hero para evitar layout shift
-        if (finalHero.backdropUrl || finalHero.imageUrl) {
-           await preloadImage(finalHero.backdropUrl || finalHero.imageUrl).catch(() => {});
-        }
-
-        setFeaturedHero(finalHero);
-        setHomeLists({
-          releases: enrichedPriority.filter(m => rawReleases.some(r => r.id === m.id)),
-          top10: enrichedPriority.filter(m => rawTop10.some(r => r.id === m.id)),
-          continueWatching: movies.slice(15, 22),
-          // Agora usa os dados enriquecidos para Trending também
-          trending: enrichedPriority.filter(m => rawTrending.some(r => r.id === m.id))
-        });
-
-        // Libera a UI imediatamente
-        setIsAppLoading(false);
-        setDisplayCatalog([...globalCatalogRef.current]); // Atualiza view inicial
-
-        // --- FASE 2: CARREGAMENTO PROGRESSIVO EM SEGUNDO PLANO ---
-        // Carrega Séries, Animes e Desenhos sem bloquear a thread principal
-        setTimeout(() => {
-           // 1. Carrega Séries
-           const series = RAW_PARSED_SERIES;
-           globalCatalogRef.current = [...globalCatalogRef.current, ...series];
-           
-           // 2. Carrega Animes e Desenhos (pequeno delay para não travar scroll)
-           setTimeout(() => {
-              const others = [...RAW_PARSED_ANIMES, ...RAW_PARSED_CARTOONS];
-              globalCatalogRef.current = [...globalCatalogRef.current, ...others];
-              
-              // Atualiza o estado visível apenas uma vez no final para evitar re-renderizações
-              setDisplayCatalog([...globalCatalogRef.current]);
-           }, 500);
-
-        }, 1000);
-      } catch (e) {
-        console.error("Critical Init Error:", e);
-        // Em caso de erro crítico, libera a UI para não travar no loading
-        setIsAppLoading(false);
+      // Configura dados da Home
+      const finalHero = enrichedPriority.find(m => m.id === rawHero.id) || rawHero;
+      
+      // Preload da imagem do Hero para evitar layout shift
+      if (finalHero.backdropUrl || finalHero.imageUrl) {
+         await preloadImage(finalHero.backdropUrl || finalHero.imageUrl);
       }
+
+      setFeaturedHero(finalHero);
+      setHomeLists({
+        releases: enrichedPriority.filter(m => rawReleases.some(r => r.id === m.id)),
+        top10: enrichedPriority.filter(m => rawTop10.some(r => r.id === m.id)),
+        continueWatching: movies.slice(15, 22),
+        // Agora usa os dados enriquecidos para Trending também
+        trending: enrichedPriority.filter(m => rawTrending.some(r => r.id === m.id))
+      });
+
+      // Libera a UI imediatamente
+      setIsAppLoading(false);
+      setDisplayCatalog([...globalCatalogRef.current]); // Atualiza view inicial
+
+      // --- FASE 2: CARREGAMENTO PROGRESSIVO EM SEGUNDO PLANO ---
+      // Carrega Séries, Animes e Desenhos sem bloquear a thread principal
+      setTimeout(() => {
+         // 1. Carrega Séries
+         const series = RAW_PARSED_SERIES;
+         globalCatalogRef.current = [...globalCatalogRef.current, ...series];
+         
+         // 2. Carrega Animes e Desenhos (pequeno delay para não travar scroll)
+         setTimeout(() => {
+            const others = [...RAW_PARSED_ANIMES, ...RAW_PARSED_CARTOONS];
+            globalCatalogRef.current = [...globalCatalogRef.current, ...others];
+            
+            // Atualiza o estado visível apenas uma vez no final para evitar re-renderizações
+            setDisplayCatalog([...globalCatalogRef.current]);
+         }, 500);
+
+      }, 1000);
     };
 
     initFast();
@@ -215,7 +202,7 @@ const MainApp: React.FC = () => {
 
   const renderContent = () => {
     if (currentView === 'auth' && !user) {
-        return <AuthPage onSuccess={() => setCurrentView('home')} onClose={() => setCurrentView('home')} />;
+        return <AuthPage onSuccess={() => setCurrentView('home')} />;
     }
 
     if (selectedMovie) {
@@ -292,16 +279,10 @@ const MainApp: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-text font-sans antialiased selection:bg-brand/30 selection:text-white pb-20 md:pb-0">
+    <div className="min-h-screen bg-background text-text font-sans antialiased selection:bg-brand/30 selection:text-white pb-14 md:pb-0">
       
-      {/* Top Navbar (Visível no Desktop, Simplificado no Mobile) */}
       {currentView !== 'auth' && (
         <Navbar currentView={currentView} onNavigate={handleNavigate} searchQuery={searchQuery} onSearchChange={handleSearchChange} />
-      )}
-
-      {/* Bottom Navigation (Mobile Only) */}
-      {currentView !== 'auth' && (
-        <BottomNav currentView={currentView} onNavigate={(view) => handleNavigate(view)} />
       )}
       
       <InstallPrompt />

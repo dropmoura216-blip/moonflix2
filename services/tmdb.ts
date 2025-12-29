@@ -75,9 +75,6 @@ export const TmdbService = {
           if (id.startsWith('tt')) {
             const findUrl = `${BASE_URL}/find/${id}?api_key=${API_KEY}&external_source=imdb_id&language=pt-BR`;
             const findRes = await fetch(findUrl);
-            
-            if (!findRes.ok) throw new Error('Failed to find ID');
-            
             const findData = await findRes.json();
 
             // Se o tipo original for Anime, Cartoon ou Série, prioriza resultados de TV
@@ -105,8 +102,6 @@ export const TmdbService = {
             const detailsUrl = `${BASE_URL}/${apiMediaType}/${tmdbId}?api_key=${API_KEY}&language=pt-BR&append_to_response=credits`;
             
             const detailsRes = await fetch(detailsUrl);
-            if (!detailsRes.ok) throw new Error('Failed to fetch details');
-            
             const detailsData = await detailsRes.json();
 
             // Mantém o tipo original se foi passado assim, caso contrário usa a detecção
@@ -164,9 +159,6 @@ export const TmdbService = {
       // Busca filmes e séries (multi search)
       const searchUrl = `${BASE_URL}/search/multi?api_key=${API_KEY}&language=pt-BR&query=${encodeURIComponent(query)}&page=1&include_adult=false`;
       const res = await fetch(searchUrl);
-      
-      if (!res.ok) return [];
-
       const data = await res.json();
       
       // Filtra apenas filmes e séries, normalizando o título

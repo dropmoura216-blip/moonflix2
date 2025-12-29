@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { Logo } from './Logo';
-import { Mail, Lock, Loader2, ArrowRight, AlertCircle, X } from 'lucide-react';
+import { Mail, Lock, Loader2, ArrowRight, AlertCircle, X, ShieldCheck } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -85,6 +84,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
           <p className="text-gray-400 text-center text-sm mt-1">
              O conteúdo é exclusivo para membros MoonFlix.
           </p>
+          
+          {/* AVISO IMPORTANTE: Não precisa verificar */}
+          {!isLogin && (
+            <div className="mt-3 flex items-center gap-1.5 text-[#4ade80] text-xs font-bold bg-[#4ade80]/10 px-3 py-1 rounded-full border border-[#4ade80]/20 animate-pulse">
+                <ShieldCheck size={12} /> Não precisa verificar a conta
+            </div>
+          )}
         </div>
 
         {error && (

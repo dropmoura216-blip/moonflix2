@@ -4,7 +4,6 @@ import { Movie } from '../types';
 import { MovieCard } from './MovieCard';
 import { NEWS_UPDATES } from '../constants';
 import { useAuth } from '../contexts/AuthContext';
-import { SubscriptionModal } from './SubscriptionModal';
 
 // 1. Benefits Bar (Icons under hero)
 export const BenefitsBar: React.FC = () => {
@@ -225,14 +224,10 @@ interface SidebarLayoutProps {
 
 export const ContentWithSidebar: React.FC<SidebarLayoutProps> = ({ movies, onMovieClick }) => {
   const gridMovies = movies ? movies.slice(0, 4) : [];
-  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-  const { isPremium } = useAuth();
 
   return (
     <div className="w-full max-w-[2400px] mx-auto px-4 md:px-12 py-10 border-t border-white/5">
       
-      <SubscriptionModal isOpen={showSubscriptionModal} onClose={() => setShowSubscriptionModal(false)} />
-
       <div className="flex flex-col lg:flex-row gap-8">
         
         {/* Left Column: Main Content */}
@@ -250,22 +245,6 @@ export const ContentWithSidebar: React.FC<SidebarLayoutProps> = ({ movies, onMov
               <MovieCard key={movie.id} movie={movie} onClick={onMovieClick} />
             ))}
           </div>
-
-          {!isPremium && (
-            <div className="mt-8 relative rounded-xl overflow-hidden bg-gradient-to-r from-purple-900 to-blue-900 p-6 flex flex-col md:flex-row items-center justify-between gap-4 border border-white/10 shadow-2xl">
-                <div className="text-center md:text-left z-10">
-                <h4 className="text-white font-bold text-lg">Remova os Anúncios</h4>
-                <p className="text-purple-200 text-sm mt-1">Experiência premium por apenas R$ 6,90/mês.</p>
-                </div>
-                <button 
-                    onClick={() => setShowSubscriptionModal(true)}
-                    className="px-5 py-2 bg-white text-purple-900 font-bold rounded-full text-sm hover:bg-gray-100 transition-colors z-10"
-                >
-                Assinar Agora
-                </button>
-                <div className="absolute top-0 right-0 w-32 h-32 bg-brand/30 rounded-full blur-3xl -mr-10 -mt-10"></div>
-            </div>
-          )}
         </div>
 
         {/* Right Column: Sidebar */}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Check, Star, Zap, Shield, Tv } from 'lucide-react';
+import { X, Check, Star, Zap, Shield, Tv, MousePointerClick } from 'lucide-react';
 import { Logo } from './Logo';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -49,9 +49,9 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen, on
             <Star size={12} fill="currentColor" /> Premium
           </div>
 
-          <h2 className="text-3xl font-black text-white mb-2">Remova os Anúncios</h2>
+          <h2 className="text-3xl font-black text-white mb-2">Chega de Anúncios</h2>
           <p className="text-gray-400 text-sm max-w-xs mx-auto mb-8">
-            Tenha uma experiência fluida, sem interrupções e com acesso imediato.
+            Assista seus filmes e séries favoritos direto, sem interrupções e sem pop-ups.
           </p>
 
           {/* Pricing Card */}
@@ -60,32 +60,28 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen, on
              
              <div className="flex justify-between items-end mb-6 relative z-10">
                 <div className="text-left">
-                    <p className="text-gray-400 text-xs font-medium uppercase">Plano Sem Anúncios</p>
+                    <p className="text-gray-400 text-xs font-medium uppercase">Plano Mensal</p>
                     <div className="flex items-baseline gap-1">
                         <span className="text-sm text-gray-400 font-medium">R$</span>
                         <span className="text-4xl font-black text-white">6,90</span>
                         <span className="text-gray-500 text-sm">/mês</span>
                     </div>
                 </div>
-                <div className="bg-brand text-white text-[10px] font-bold px-2 py-1 rounded">MELHOR VALOR</div>
+                <div className="bg-brand text-white text-[10px] font-bold px-2 py-1 rounded">OFERTA</div>
              </div>
 
              <ul className="space-y-3 relative z-10">
-                <li className="flex items-center gap-3 text-sm text-gray-300">
-                    <Shield size={16} className="text-brand" /> 
-                    <span><strong>Zero</strong> Anúncios ou Pop-ups</span>
+                <li className="flex items-center gap-3 text-sm text-white font-bold">
+                    <MousePointerClick size={16} className="text-brand" /> 
+                    <span>Zero Anúncios Pop-up (Clique e Toca)</span>
                 </li>
                 <li className="flex items-center gap-3 text-sm text-gray-300">
-                    <Zap size={16} className="text-brand" /> 
-                    <span>Início <strong>Imediato</strong> dos Vídeos</span>
+                    <Check size={16} className="text-brand" /> 
+                    <span>Acesso a <strong>Todos</strong> os Filmes e Séries</span>
                 </li>
                 <li className="flex items-center gap-3 text-sm text-gray-300">
                     <Tv size={16} className="text-brand" /> 
                     <span>Qualidade <strong>4K Ultra HD</strong></span>
-                </li>
-                <li className="flex items-center gap-3 text-sm text-gray-300">
-                    <Check size={16} className="text-brand" /> 
-                    <span>Acesso a Todo o Catálogo</span>
                 </li>
              </ul>
           </div>
@@ -101,12 +97,12 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen, on
                     Processando...
                 </div>
             ) : (
-                "Remover Anúncios por R$ 6,90"
+                "Assinar Agora por R$ 6,90"
             )}
           </button>
           
           <p className="text-[10px] text-gray-600 mt-4">
-            Cancele a qualquer momento nas configurações. Cobrança recorrente.
+            Cancele a qualquer momento. Preço promocional por tempo limitado.
           </p>
 
         </div>

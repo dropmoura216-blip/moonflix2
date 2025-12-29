@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Settings, HelpCircle, ChevronRight, User as UserIcon, LogOut, List, Shield, Smartphone, CreditCard, Loader2, Star, Crown } from 'lucide-react';
+import { Settings, HelpCircle, ChevronRight, User as UserIcon, LogOut, List, Shield, Smartphone, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { UserService } from '../services/userService';
 import { TmdbService } from '../services/tmdb';
 import { Movie } from '../types';
 import { MovieCard } from './MovieCard';
-import { SubscriptionModal } from './SubscriptionModal';
 
 interface ProfilePageProps {
   allMovies: Movie[];
@@ -14,14 +13,13 @@ interface ProfilePageProps {
 }
 
 export const ProfilePage: React.FC<ProfilePageProps> = ({ allMovies, onMovieClick, onSignOut }) => {
-  const { user, signOut, isPremium } = useAuth();
+  const { user, signOut } = useAuth();
   
   // Separação de estados para evitar flickering
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [favoriteMovies, setFavoriteMovies] = useState<Movie[]>([]);
   const [loadingIds, setLoadingIds] = useState(true);
   const [isResolvingMovies, setIsResolvingMovies] = useState(true);
-  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   const MenuItem = ({ icon, label, subLabel = '', onClick }: { icon: React.ReactNode, label: string, subLabel?: string, onClick?: () => void }) => (
     <button onClick={onClick} className="w-full flex items-center justify-between p-4 bg-secondary/30 hover:bg-secondary border border-white/5 rounded-xl transition-all group active:scale-[0.99] hover:border-white/10 h-full">
@@ -131,8 +129,6 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ allMovies, onMovieClic
   return (
     <div className="min-h-screen bg-background pt-20 md:pt-32 pb-28 px-4 md:px-12 animate-in slide-in-from-right-4 duration-300">
       
-      <SubscriptionModal isOpen={showSubscriptionModal} onClose={() => setShowSubscriptionModal(false)} />
-
       <div className="max-w-[1600px] mx-auto">
         
         <h1 className="text-3xl font-bold text-white mb-8 hidden md:block border-b border-white/5 pb-4">Minha Conta</h1>
@@ -142,15 +138,15 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ allMovies, onMovieClic
             <div className="w-full lg:w-[320px] flex-shrink-0">
                 <div className="bg-[#0f1110] border border-white/5 rounded-2xl p-6 flex flex-col items-center sticky top-28 shadow-2xl">
                     <div className="relative w-28 h-28 md:w-32 md:h-32 mb-4 group cursor-pointer">
-                        <div className={`w-full h-full rounded-full p-[3px] transition-transform group-hover:scale-105 ${isPremium ? 'bg-gradient-to-tr from-[#FFD700] via-[#FDB931] to-[#E5B546]' : 'bg-gradient-to-tr from-brand to-purple-900'}`}>
+                        <div className={`w-full h-full rounded-full p-[3px] transition-transform group-hover:scale-105 bg-gradient-to-tr from-brand to-purple-900`}>
                           <div className="w-full h-full rounded-full bg-[#0a0a0a] flex items-center justify-center border-4 border-background overflow-hidden">
                               <span className="text-4xl font-bold text-white">
                                 {user.email?.charAt(0).toUpperCase()}
                               </span>
                           </div>
                         </div>
-                        <div className={`absolute bottom-1 right-1 border border-white/10 p-2 rounded-full transition-colors shadow-lg ${isPremium ? 'bg-[#FFD700] text-black' : 'bg-secondary text-brand'}`}>
-                           {isPremium ? <Crown size={16} fill="currentColor" /> : <Settings size={16} />}
+                        <div className={`absolute bottom-1 right-1 border border-white/10 p-2 rounded-full transition-colors shadow-lg bg-secondary text-brand`}>
+                           <Settings size={16} />
                         </div>
                     </div>
                     
@@ -159,32 +155,16 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ allMovies, onMovieClic
                       <span className="w-2 h-2 rounded-full bg-green-500"></span> Online agora
                     </p>
                     
-                    <div className={`w-full rounded-xl p-4 border border-white/5 mb-6 ${isPremium ? 'bg-gradient-to-r from-[#FFD700]/10 to-transparent' : 'bg-secondary/30'}`}>
+                    <div className={`w-full rounded-xl p-4 border border-white/5 mb-6 bg-secondary/30`}>
                         <div className="flex justify-between items-center text-sm mb-3">
-                            <span className="text-gray-400">Plano</span>
-                            {isPremium ? (
-                                <span className="text-black font-bold bg-[#FFD700] px-3 py-0.5 rounded text-xs shadow-lg shadow-[#FFD700]/20 flex items-center gap-1">
-                                    <Star size={10} fill="currentColor"/> PREMIUM
-                                </span>
-                            ) : (
-                                <span className="text-gray-300 font-bold bg-white/10 px-2 py-0.5 rounded text-xs border border-white/10">GRATUITO</span>
-                            )}
+                            <span className="text-gray-400">Status</span>
+                            <span className="text-gray-300 font-bold bg-white/10 px-2 py-0.5 rounded text-xs border border-white/10">MEMBRO</span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
-                            <span className="text-gray-400">Membro desde</span>
+                            <span className="text-gray-400">Desde</span>
                             <span className="text-white text-xs">{new Date(user.created_at).toLocaleDateString()}</span>
                         </div>
                     </div>
-
-                    {!isPremium && (
-                        <button 
-                            onClick={() => setShowSubscriptionModal(true)}
-                            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-brand text-white rounded-lg font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20 mb-3 animate-pulse"
-                        >
-                            <Star size={18} fill="currentColor" />
-                            Assinar Premium
-                        </button>
-                    )}
 
                     <button 
                         onClick={handleLogout}
@@ -238,12 +218,6 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ allMovies, onMovieClic
                                 label="Dados da Conta" 
                                 subLabel="Email, senha e segurança"
                             />
-                             <MenuItem 
-                                icon={<CreditCard size={20} />} 
-                                label="Assinatura" 
-                                subLabel={isPremium ? "Gerenciar plano Premium" : "Fazer upgrade para Premium"}
-                                onClick={() => setShowSubscriptionModal(true)}
-                            />
                             <MenuItem 
                                 icon={<Shield size={20} />} 
                                 label="Privacidade" 
@@ -269,7 +243,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ allMovies, onMovieClic
                 <div className="mt-12 border-t border-white/5 pt-8 text-center md:text-left">
                     <div className="text-[10px] text-gray-600">
                        ID do Usuário: {user.id}<br/>
-                       Versão 2.1.0 (Live Sync)
+                       Versão 2.2.0 (Free Tier)
                     </div>
                 </div>
 

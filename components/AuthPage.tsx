@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { supabase } from '../services/supabase';
 import { Logo } from './Logo';
-import { Mail, Lock, Loader2, ArrowRight, AlertCircle, X } from 'lucide-react';
+import { Mail, Lock, Loader2, ArrowRight, AlertCircle } from 'lucide-react';
 
 interface AuthPageProps {
   onSuccess: () => void;
-  onClose?: () => void;
 }
 
-export const AuthPage: React.FC<AuthPageProps> = ({ onSuccess, onClose }) => {
+export const AuthPage: React.FC<AuthPageProps> = ({ onSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -50,17 +49,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onSuccess, onClose }) => {
       {/* Background Ambience */}
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-brand/20 blur-[150px] rounded-full animate-pulse pointer-events-none"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none"></div>
-
-      {/* Close Button */}
-      {onClose && (
-        <button 
-          onClick={onClose}
-          className="absolute top-6 right-6 z-50 p-2 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white rounded-full transition-all duration-300 backdrop-blur-md border border-white/5 group"
-          aria-label="Fechar"
-        >
-          <X size={24} className="group-hover:rotate-90 transition-transform duration-300" />
-        </button>
-      )}
 
       <div className="w-full max-w-md bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-500">
         
