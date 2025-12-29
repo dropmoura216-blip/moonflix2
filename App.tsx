@@ -12,7 +12,6 @@ import { BrowsePage } from './components/BrowsePage';
 import { LoadingScreen } from './components/LoadingScreen';
 import { InstallPrompt } from './components/InstallPrompt';
 import { AuthPage } from './components/AuthPage';
-import { DesktopAds } from './components/DesktopAds';
 import { 
   BenefitsBar, 
   FeaturedCollections, 
@@ -295,9 +294,6 @@ const MainApp: React.FC = () => {
   return (
     <div className="min-h-screen bg-background text-text font-sans antialiased selection:bg-brand/30 selection:text-white pb-20 md:pb-0">
       
-      {/* Gerenciador de Anúncios Desktop */}
-      <DesktopAds />
-
       {/* Top Navbar (Visível no Desktop, Simplificado no Mobile) */}
       {currentView !== 'auth' && (
         <Navbar currentView={currentView} onNavigate={handleNavigate} searchQuery={searchQuery} onSearchChange={handleSearchChange} />

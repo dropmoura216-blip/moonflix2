@@ -11,19 +11,12 @@ interface VideoPlayerProps {
   title: string;
 }
 
-const AD_LINKS = [
-  "https://tertheyhadgoneh.com?tid=1234284",
-  "https://tertheyhadgoneh.com?fJMU8=1234291",
-  "https://tertheyhadgoneh.com?esb3s=1234292"
-];
-
 export const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, poster, backdrop, title }) => {
   const { user, isPremium } = useAuth();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-  const [adClickCount, setAdClickCount] = useState(0);
 
   // Define a imagem de fundo: prefere backdrop (horizontal) para o player
   const bgImage = backdrop || poster;
@@ -46,13 +39,6 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, poster, backdrop,
   };
 
   const handlePlayClick = () => {
-    // Lógica de Anúncios Sequenciais (Pop-under style)
-    if (adClickCount < AD_LINKS.length) {
-      window.open(AD_LINKS[adClickCount], '_blank');
-      setAdClickCount(prev => prev + 1);
-      return;
-    }
-
     if (!user) {
       setShowAuthModal(true);
       return;
@@ -126,7 +112,6 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, poster, backdrop,
                   
                   {/* Main Button */}
                   <div className="relative w-20 h-20 md:w-24 md:h-24 bg-white/10 backdrop-blur-md border border-white/30 rounded-full flex items-center justify-center transition-all duration-300 group-hover/btn:scale-110 group-hover/btn:bg-brand group-hover/btn:border-brand shadow-[0_0_40px_rgba(0,0,0,0.5)]">
-                    {/* Exibe o ícone de Play sempre, pois o clique inicial é para anúncios, a lógica de bloqueio visual fica secundária à interatividade */}
                     <Play size={36} className="ml-2 text-white fill-white" />
                   </div>
               </div>
