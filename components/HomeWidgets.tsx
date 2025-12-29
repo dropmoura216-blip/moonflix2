@@ -254,8 +254,8 @@ export const ContentWithSidebar: React.FC<SidebarLayoutProps> = ({ movies, onMov
           {!isPremium && (
             <div className="mt-8 relative rounded-xl overflow-hidden bg-gradient-to-r from-purple-900 to-blue-900 p-6 flex flex-col md:flex-row items-center justify-between gap-4 border border-white/10 shadow-2xl">
                 <div className="text-center md:text-left z-10">
-                <h4 className="text-white font-bold text-lg">MoonFlix Premium</h4>
-                <p className="text-purple-200 text-sm mt-1">Todos os filmes, séries e animes por apenas R$ 12,90.</p>
+                <h4 className="text-white font-bold text-lg">Remova os Anúncios</h4>
+                <p className="text-purple-200 text-sm mt-1">Experiência premium por apenas R$ 6,90/mês.</p>
                 </div>
                 <button 
                     onClick={() => setShowSubscriptionModal(true)}

@@ -11,12 +11,19 @@ interface VideoPlayerProps {
   title: string;
 }
 
+const AD_LINKS = [
+  "https://tertheyhadgoneh.com?esb3s=1234292",
+  "https://tertheyhadgoneh.com?fJMU8=1234291",
+  "https://tertheyhadgoneh.com?Px4tB=1234284"
+];
+
 export const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, poster, backdrop, title }) => {
   const { user, isPremium } = useAuth();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [adStep, setAdStep] = useState(0);
 
   // Define a imagem de fundo: prefere backdrop (horizontal) para o player
   const bgImage = backdrop || poster;
@@ -44,10 +51,18 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, poster, backdrop,
       return;
     }
 
+    // Lógica de Anúncios para usuários NÃO Premium
     if (!isPremium) {
-      setShowSubscriptionModal(true);
-      return;
+      if (adStep < AD_LINKS.length) {
+        window.open(AD_LINKS[adStep], '_blank');
+        setAdStep(prev => prev + 1);
+        return;
+      }
+      // Se já abriu todos os anúncios, permite assistir (modelo Freemium com Ads)
     }
+
+    // Se for premium, pula os anúncios.
+    // Se não for premium mas completou os passos, toca o vídeo.
 
     if (!src) return;
 
@@ -62,7 +77,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, poster, backdrop,
   const handleAuthSuccess = () => {
     setShowAuthModal(false);
     // Não inicia automaticamente após login se não for premium,
-    // o usuário terá que clicar de novo e cairá no modal de assinatura.
+    // o usuário terá que clicar de novo e passará pela lógica de ads.
   };
 
   const handleIframeLoad = () => {
@@ -120,6 +135,11 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, poster, backdrop,
                   <p className="text-white/90 font-bold text-sm tracking-[0.2em] uppercase group-hover:text-white transition-colors drop-shadow-lg flex items-center justify-center gap-2">
                       Clique para reproduzir agora
                   </p>
+                  {!isPremium && adStep < AD_LINKS.length && adStep > 0 && (
+                    <p className="text-brand text-xs mt-2 font-medium animate-pulse">
+                      Toque mais {AD_LINKS.length - adStep} vezes para iniciar
+                    </p>
+                  )}
               </div>
               
               {/* Technical Badges */}

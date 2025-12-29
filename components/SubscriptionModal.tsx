@@ -49,9 +49,9 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen, on
             <Star size={12} fill="currentColor" /> Premium
           </div>
 
-          <h2 className="text-3xl font-black text-white mb-2">Desbloqueie Tudo</h2>
+          <h2 className="text-3xl font-black text-white mb-2">Remova os Anúncios</h2>
           <p className="text-gray-400 text-sm max-w-xs mx-auto mb-8">
-            Tenha acesso ilimitado ao maior catálogo de streaming do universo.
+            Tenha uma experiência fluida, sem interrupções e com acesso imediato.
           </p>
 
           {/* Pricing Card */}
@@ -60,10 +60,10 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen, on
              
              <div className="flex justify-between items-end mb-6 relative z-10">
                 <div className="text-left">
-                    <p className="text-gray-400 text-xs font-medium uppercase">Plano Mensal</p>
+                    <p className="text-gray-400 text-xs font-medium uppercase">Plano Sem Anúncios</p>
                     <div className="flex items-baseline gap-1">
                         <span className="text-sm text-gray-400 font-medium">R$</span>
-                        <span className="text-4xl font-black text-white">12,90</span>
+                        <span className="text-4xl font-black text-white">6,90</span>
                         <span className="text-gray-500 text-sm">/mês</span>
                     </div>
                 </div>
@@ -72,20 +72,20 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen, on
 
              <ul className="space-y-3 relative z-10">
                 <li className="flex items-center gap-3 text-sm text-gray-300">
-                    <Check size={16} className="text-brand" /> 
-                    <span>Acesso a <strong>Todos</strong> os Filmes e Séries</span>
+                    <Shield size={16} className="text-brand" /> 
+                    <span><strong>Zero</strong> Anúncios ou Pop-ups</span>
                 </li>
                 <li className="flex items-center gap-3 text-sm text-gray-300">
                     <Zap size={16} className="text-brand" /> 
-                    <span>Animes e Desenhos Completos</span>
+                    <span>Início <strong>Imediato</strong> dos Vídeos</span>
                 </li>
                 <li className="flex items-center gap-3 text-sm text-gray-300">
                     <Tv size={16} className="text-brand" /> 
                     <span>Qualidade <strong>4K Ultra HD</strong></span>
                 </li>
                 <li className="flex items-center gap-3 text-sm text-gray-300">
-                    <Shield size={16} className="text-brand" /> 
-                    <span>Sem Anúncios</span>
+                    <Check size={16} className="text-brand" /> 
+                    <span>Acesso a Todo o Catálogo</span>
                 </li>
              </ul>
           </div>
@@ -101,7 +101,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen, on
                     Processando...
                 </div>
             ) : (
-                "Assinar Agora por R$ 12,90"
+                "Remover Anúncios por R$ 6,90"
             )}
           </button>
           
