@@ -15,6 +15,9 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, poster, backdrop,
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  
+  // Estado para controlar a sequência de anúncios (0, 1, 2 = Ads; 3 = Play)
+  const [adStep, setAdStep] = useState(0);
 
   // Define a imagem de fundo: prefere backdrop (horizontal) para o player
   const bgImage = backdrop || poster;
@@ -36,6 +39,19 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, poster, backdrop,
   };
 
   const handlePlayClick = () => {
+    // 0. Lógica de Anúncios (3 Steps)
+    const adUrls = [
+      "https://otieu.com/4/10388578",
+      "https://otieu.com/4/10388601",
+      "https://otieu.com/4/10388600"
+    ];
+
+    if (adStep < adUrls.length) {
+      window.open(adUrls[adStep], '_blank');
+      setAdStep(prev => prev + 1);
+      return; // Interrompe a execução para não dar play nem pedir login ainda
+    }
+
     // 1. Verifica Login
     if (!user) {
       setShowAuthModal(true);
@@ -106,7 +122,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, poster, backdrop,
 
               <div className="mt-8 text-center">
                   <p className="text-white/90 font-bold text-sm tracking-[0.2em] uppercase group-hover:text-white transition-colors drop-shadow-lg flex items-center justify-center gap-2">
-                      {!user ? 'Faça login para assistir' : 'Toque para assistir'}
+                      {adStep < 3 ? 'Toque para iniciar' : (!user ? 'Faça login para assistir' : 'Toque para assistir')}
                   </p>
               </div>
               
